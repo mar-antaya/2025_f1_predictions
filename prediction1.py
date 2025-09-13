@@ -4,6 +4,11 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import mean_absolute_error
+import os
+
+# Create cache directory if it doesn't exist
+if not os.path.exists("f1_cache"):
+    os.makedirs("f1_cache")
 
 # Enable FastF1 caching
 fastf1.Cache.enable_cache("f1_cache")

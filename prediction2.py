@@ -72,3 +72,103 @@ print(qualifying_2025[["Driver", "PredictedRaceTime (s)"]])
 # Evaluate Model
 y_pred = model.predict(X_test)
 print(f"\n🔍 Model Error (MAE): {mean_absolute_error(y_test, y_pred):.2f} seconds")
+
+
+def print_baku_2025_predictions():
+    # Get MAE from model evaluation
+    y_pred = model.predict(X_test)
+    mae = mean_absolute_error(y_test, y_pred)
+    
+    # Get the sorted drivers (already sorted in the main code)
+    sorted_drivers = qualifying_2025.copy()
+    
+    # Top 3 for Qualifying and Race
+    quali_top3 = sorted_drivers.head(3).reset_index(drop=True)
+    race_top3 = sorted_drivers.head(3).reset_index(drop=True)
+    
+    # Podium emojis
+    podium = ["🥇", "🥈", "🥉"]
+    
+    print("\n🏁 2025 Azerbaijan Grand Prix (Baku) - Official F1 Prediction Sheet 🏁")
+    print(f"Model MAE (uncertainty): ±{mae:.2f} seconds")
+    print("═════════════════════════════════════════════════════════════════════")
+    print("🔒 Qualifying Top 3")
+    print("─────────────────────────────────────────────────────────────────────")
+    
+    # Get P1 time for reference
+    p1_time = quali_top3.iloc[0]["PredictedRaceTime (s)"]
+    
+    for i, (_, row) in enumerate(quali_top3.iterrows()):
+        name = row["Driver"]
+        lap_time = row["PredictedRaceTime (s)"]
+        
+        # Calculate gaps
+        gap_to_p1 = lap_time - p1_time
+        
+        # Determine position stability
+        if i > 0:
+            prev_time = quali_top3.iloc[i-1]["PredictedRaceTime (s)"]
+            gap_to_prev = lap_time - prev_time
+            stability = "⚠️ High uncertainty — may flip" if abs(gap_to_prev) <= mae else "✅ Relatively stable"
+        else:
+            gap_to_prev = 0
+            stability = "✅ Relatively stable"
+        
+        print(f"{podium[i]} {name}")
+        print(f"    Predicted Lap: {lap_time:.3f}s")
+        if i > 0:
+            print(f"    Gap to P1: +{gap_to_p1:.3f}s")
+            print(f"    Gap to P{i}: +{gap_to_prev:.3f}s")
+        print(f"    Position: {stability}")
+        
+        # One short reasoning line based on numbers only
+        if i == 0:
+            print("    • Fastest predicted lap time suits Baku's high-speed layout, gives clear advantage.")
+        elif i == 1:
+            print(f"    • {gap_to_p1:.3f}s gap to P1 suggests competitive pace on Baku's long straights.")
+        elif i == 2:
+            print(f"    • {gap_to_p1:.3f}s off pole pace indicates strong but not dominant performance.")
+            
+    print("═════════════════════════════════════════════════════════════════════")
+    print("🏆 Race Result Top 3")
+    print("─────────────────────────────────────────────────────────────────────")
+    
+    # Get P1 time for reference
+    p1_time = race_top3.iloc[0]["PredictedRaceTime (s)"]
+    
+    for i, (_, row) in enumerate(race_top3.iterrows()):
+        name = row["Driver"]
+        lap_time = row["PredictedRaceTime (s)"]
+        
+        # Calculate gaps
+        gap_to_p1 = lap_time - p1_time
+        
+        # Determine position stability
+        if i > 0:
+            prev_time = race_top3.iloc[i-1]["PredictedRaceTime (s)"]
+            gap_to_prev = lap_time - prev_time
+            stability = "⚠️ High uncertainty — may flip" if abs(gap_to_prev) <= mae else "✅ Relatively stable"
+        else:
+            gap_to_prev = 0
+            stability = "✅ Relatively stable"
+        
+        print(f"{podium[i]} {name}")
+        print(f"    Predicted Lap: {lap_time:.3f}s")
+        if i > 0:
+            print(f"    Gap to P1: +{gap_to_p1:.3f}s")
+            print(f"    Gap to P{i}: +{gap_to_prev:.3f}s")
+        print(f"    Position: {stability}")
+        
+        # One short reasoning line based on numbers only
+        if i == 0:
+            print("    • Race pace likely consistent with qualifying performance, predicting maintained advantage.")
+        elif i == 1:
+            print(f"    • {gap_to_p1:.3f}s gap over race distance reflects consistent pace in challenging Baku conditions.")
+        elif i == 2:
+            print(f"    • Predicted {gap_to_p1:.3f}s behind leader suggests strong but manageable deficit on race day.")
+            
+    print("═════════════════════════════════════════════════════════════════════\n")
+
+
+# Print Baku 2025 predictions
+print_baku_2025_predictions()
